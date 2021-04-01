@@ -1,0 +1,17 @@
+version: 1.0.0
+
+log_level: debug
+
+services:
+  main:
+    exec_start:
+    depends_on:
+      - consul
+  consul:
+    exec_start: consul agent -retry-join=consul -config-file /opt/consul/config.json
+    lifecycle:
+      post_start:
+        exec:
+          command: while true; do sleep 1 && consul catalog services > /dev/null && exit 0 ;done
+  nginx:
+    exec_start: nginx -g "daemon off;"

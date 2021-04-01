@@ -1,0 +1,15 @@
+version: 1.0.0
+
+log_level: debug
+
+services:
+  main:
+    exec_start: tensorflow_model_server --per_process_gpu_memory_fraction=0.5 --port=9000 --rest_api_port=80 --model_config_file_poll_wait_seconds=60 --model_config_file=/data/models/models.config --monitoring_config_file=/data/models/monitoring.config
+    depends_on:
+      - consul
+  consul:
+    exec_start: consul agent -retry-join=consul -datacenter=dc1 -http-port=8500 -client=0.0.0.0 -data-dir=/data/consul/data -pid-file=/var/run/consul.pid
+    lifecycle:
+      post_start:
+        exec:
+          command: while true; do sleep 1 && consul catalog services > /dev/null && exit 0;done

@@ -1,0 +1,26 @@
+version: 1.0.0
+
+log_level: debug
+
+services:
+  main:
+    exec_start:
+    depends_on:
+      - consul
+  consul:
+    exec_start: sleep 1000
+    lifecycle:
+      pre_start:
+        exec:
+          command: echo "pre_start" && sleep xxx
+      post_start:
+        exec:
+          command: echo "post_start"
+      pre_stop:
+        exec:
+          command: echo "pre_stop"
+      post_stop:
+        exec:
+          command: echo "post_stop" && sleep 10
+  test:
+    exec_start: sleep 2000
